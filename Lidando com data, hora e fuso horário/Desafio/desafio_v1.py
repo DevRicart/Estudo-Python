@@ -1,3 +1,10 @@
+"""
+Com os novos conhecimentos adquiridos sobre data e hora, você foi encarregado de implementar as seguintes funcionalidades no sisetma: 
+- Estabelecer um limite de 10 transações diárias para uma conta;
+- Se o usuário tentar fazer uma transação após atingir o limite, deve ser informado que ele excedeu o número de transações permitidas para aquele dia;
+- Mostre no extrato, a data e hora de todas as transações.
+"""
+
 import textwrap
 from abc import ABC, abstractclassmethod, abstractproperty
 from datetime import datetime
@@ -34,7 +41,7 @@ class Cliente:
 
     def realizar_transacao(self, conta, transacao):
         # TODO: validar o número de transações e invalidar a operação se for necessário
-        # print("\n@@@ Você excedeu o número de transações permitidas para hoje! @@@")
+        print("\n@@@ Você excedeu o número de transações permitidas para hoje! @@@")
         transacao.registrar(conta)
 
     def adicionar_conta(self, conta):
