@@ -33,18 +33,18 @@ Para vincular um usuário a uma conta, filtre a lista de usuários buscando o n�
 """
 def menu():
     menu = """
-           ================ MENU ================
+================= MENU ==================
 
-            [d] Depositar
-            [s] Sacar
-            [e] Extrato
-           [cc] Criar conta corrente
-           [nu] Novo usuário
-           [lc] Listar contas
-           [lu] Listar usuários
-            [q] Sair
+    [d] Depositar
+    [s] Sacar
+    [e] Extrato
+   [cc] Criar conta corrente
+   [lc] Listar lista_contas
+   [nu] Novo usuário
+   [lu] Listar usuários
+    [q] Sair
 
-           ======================================
+=========================================
         => """
     return input(menu)
 
@@ -102,57 +102,72 @@ def extrato_bancario(saldo, /, *, extrato):
 
 
 def cadastrar_usuario(lista_usuarios):
-    cpf = int(input("Digite seu CPF: "))
+    cpf = input("Digitar CPF: ")
+    usuario = filtrar_usuario(cpf, lista_usuarios)
 
-    if cpf not in lista_usuarios:
-        nome = input("Digite seu nome: ")
-        data_nascimento = input("Digite sua data de nascimento: ")
-        endereco = input("Digite seu endereço: ")
-        lista_usuarios[cpf] = {"nome": nome, "data_nascimento": data_nascimento, "endereco": endereco}
+    if usuario:
+        print("Já existe um cadastro com este CPF!")
+        return
 
-    elif cpf in lista_usuarios:
-        print("CPF já cadastrado!")
+    nome = input("Digite seu nome: ")
+    data_nascimento = input("Digite sua data de nascimento: ")
+    endereco = input("Digite seu endereço: ")
 
-    return lista_usuarios
+    lista_usuarios.append({"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf, "endereco": endereco})
+
+    print("Usuário criado com sucesso!")
 
 
-def criar_conta(lista_usuario, lista_contas, AGENCIA, numero_conta):
-    cpf = int(input("Digite seu CPF: "))
+def filtrar_usuario(cpf, lista_usuarios):
+    usuarios_filtrados = [usuario for usuario in lista_usuarios if usuario["cpf"] == cpf]
+    return usuarios_filtrados[0] if usuarios_filtrados else None
 
-    if cpf in lista_usuario:
-        numero_conta = numero_conta + 1
-        lista_contas = lista_contas + f"""
-Nome:    {lista_usuario[cpf]["nome"]}
-Agência: {AGENCIA}
-Conta:   {numero_conta}
-\n========================================
-        """
+
+def criar_conta(agencia, numero_conta, lista_usuarios):
+    cpf = input("Informe o CPF do usuário: ")
+    usuario = filtrar_usuario(cpf, lista_usuarios)
+
+    if usuario:
+        print("Conta criada com sucesso!")
+        return {"agencia": agencia, "numero_conta": numero_conta, "usuario": usuario}
+
+    print("CPF não cadastrado! Por favor, crie um usuário primeiro.")
     
-    elif cpf not in lista_usuario:
-        print("Este usuário não possui cadastro, favor se cadastrar!")
-        cadastrar_usuario(lista_usuario)
-    
-    return lista_contas, numero_conta
 
 
 def listar_contas(lista_contas):
-    print("\n================ CONTAS ================")
-    print("Não há contas cadastradas. \n========================================" if not lista_contas else lista_contas)
+    print("\n================ lista_contas ================")
+    if lista_contas == []:
+        print("\nNão há lista_contas criadas!")
+       
+    for conta in lista_contas:
+        lista = f"""    Agência: {conta['agencia']}
+    Conta:   {conta['numero_conta']}
+    Nome:    {conta['usuario']['nome']}
+========================================
+        """
+        print(lista)
 
 def listar_usuarios(lista_usuarios):
     print("\n=============== USUÁRIOS ===============")
-    print("Não há usuários cadastrados. \n========================================" if not lista_usuarios else lista_usuarios)
-
+    for usuario in lista_usuarios:
+        lista = f"""    Nome:          {usuario['nome']}
+    CPF:           {usuario['cpf']}
+    Nascimento:    {usuario['data_nascimento']}
+    Endereço:      {usuario['endereco']}
+========================================
+    """
+        print(lista)
 
 def main():
     LIMITE_SAQUES = 3
     numero_atual_saques = 0
     saldo = 2000
     extrato = ""
-    lista_usuarios = {}
-    lista_contas = """"""
+    lista_usuarios = []
+    lista_contas = []
     AGENCIA = "0001"
-    numero_conta = 0
+    numero_conta = 1
 
     while True:
         opcao = menu()
@@ -179,7 +194,11 @@ def main():
             listar_usuarios(lista_usuarios)
 
         elif opcao == "cc":
-            lista_contas, numero_conta = criar_conta(lista_usuarios, lista_contas, AGENCIA, numero_conta)
+            nova_conta = criar_conta(AGENCIA, numero_conta, lista_usuarios)
+
+            if nova_conta:
+                lista_contas.append(nova_conta)
+                numero_conta += 1
 
         elif opcao == "lc":
             listar_contas(lista_contas)
